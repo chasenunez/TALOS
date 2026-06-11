@@ -4,12 +4,7 @@ a terminal dashboard for a directory full of git repos. it tells you which
 ones need pulling, which ones need pushing, which ones have uncommitted work,
 and which ones aren't actually git repos at all.
 
-originally a 350-line bash script (still living at `../talos.sh`); this is
-the rust rewrite. the bash version had a small but load-bearing bug where it
-never actually ran `git fetch`, so the "pull" column was silently always
-zero. that's fixed. it's also about 7× faster.
-
-part of the [GAIA](../README.md) collection.
+originally a bash script, now in Rust. 
 
 ## install
 
@@ -40,17 +35,17 @@ example output:
  ┃ ┣━┫┃  ┃ ┃┗━┓
  ╹ ╹ ╹┗━╸┗━┛┗━┛
 
-Pull: 2/44  Push: 0/44  Dirty: 3/44  No upstream: 0/44
+Pull: 2/23  Push: 0/23  Dirty: 1/23  No upstream: 0/23
 
-PATH: /Users/you/PANTHEON
+PATH: /Users/you/VAULT
 
 #    repo               state       *  +/-    last commit       Σ
 ---- ------------------ ----------- -  ------ ----------- -------
-1    AEMLAP             synced      *  0/0    08/06/26          2
-2    APOLLO             synced         0/0    20/01/26          5
+1    REPO_01             synced      *  0/0    08/06/26          2
+2    REPO_02             synced         0/0    20/01/26          5
 ...
-22   bookbot            pull           0/1    29/04/26         17
-23   chasenunez         pull           0/44   29/04/26        922
+22   REPO_22             pull           0/1    29/04/26         17
+23   REPO_23             pull           0/44   29/04/26        922
 ```
 
 ## what the columns mean
@@ -76,8 +71,7 @@ states:
 
 dirty (the `*`) is tracked independently of state. a repo can be `synced *`
 (in sync with origin but with local edits) or `pull *` (behind upstream
-*and* dirty), etc. the bash original collapsed dirty into state, so a dirty
-repo silently hid the fact that it was also behind upstream.
+*and* dirty), etc.
 
 ## how it works
 
@@ -92,10 +86,6 @@ per repo, in parallel across a thread pool (default 16 workers):
 3. `git log -1` + `git rev-list --count` for the last-commit date and
    total-commit columns.
 
-the bash version did all of this serially with broken fetching. the rust
-version's parallel pool plus cache turns a real ~25s refresh into ~1–3s
-depending on cache state.
-
 ### fetch cache
 
 each successful fetch touches a zero-byte marker file at
@@ -103,6 +93,3 @@ each successful fetch touches a zero-byte marker file at
 younger than `--fetch-ttl` (default 60s), the fetch is skipped. clear it
 with `rm -rf ~/.cache/talos` or override with `--force-fetch`.
 
-this matters once you start running talos on a tight refresh loop — the TUI
-version (coming soon) ticks every few seconds and would otherwise hammer
-every remote constantly.
