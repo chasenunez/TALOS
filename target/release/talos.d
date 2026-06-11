@@ -1,0 +1,1 @@
+/Users/nunezcha/PANTHEON/GAIA/talos/target/release/talos: /Users/nunezcha/PANTHEON/GAIA/talos/src/main.rs /Users/nunezcha/PANTHEON/GAIA/talos/src/repo.rs /Users/nunezcha/PANTHEON/GAIA/talos/src/scan.rs /Users/nunezcha/PANTHEON/GAIA/talos/src/ui.rs
