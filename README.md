@@ -1,14 +1,17 @@
-# talos
+# TALOS
 
-a terminal dashboard for a directory full of git repos. it tells you which
-ones need pulling, which ones need pushing, which ones have uncommitted work,
-and which ones aren't actually git repos at all.
+A terminal dashboard for a directory full of git repos. it tells you which ones need pulling, which ones need pushing, which ones have uncommitted work, and which ones aren't actually git repos at all. Originally a bash script, now in Rust. 
 
-originally a bash script, now in Rust. 
+## layout
+
+- `src/main.rs` — clap CLI, rayon thread-pool setup, hands off to the UI.
+- `src/ui.rs` — ratatui dashboard, key handling, background scan thread.
+- `src/scan.rs` — parallel directory walk, git plumbing, fetch cache.
+- `src/repo.rs` — `Repo` and `State` types and their colours.
 
 ## install
 
-needs:
+You will need:
 
 - a rust toolchain on edition 2024 (rustc 1.85+). easiest path is
   [rustup](https://rustup.rs).
@@ -33,15 +36,14 @@ cd talos
 cargo run --release -- --target ~/path/to/your/repos
 ```
 
-the default target is `~/PANTHEON` — that's where i keep mine. yours
-probably doesn't exist, so pass `--target` and point at any directory whose
-immediate children are git clones. talos only walks one level deep and
-hidden subdirectories are skipped, so nesting like `~/code/work/foo` won't
-get picked up unless you point at `~/code/work` directly.
+If you'd like to install TALOS so it is reachable without navigating to the script folder, you can use:
 
-while iterating on the code, `cargo run -- ...` (debug build) is fine for
-everything except the scan itself, and `cargo test` runs the unit tests
-that live next to the scanner.
+```sh
+cargo install --path .
+```
+
+The default target (the directory that holds all your git repositories) is `~/PANTHEON`.
+To make it your own, pass `--target` and point at any directory whose immediate children are git clones. talos only walks one level deep and hidden subdirectories are skipped, so nesting like `~/code/work/foo` won't get picked up unless you point at `~/code/work` directly.
 
 ## use
 
@@ -126,12 +128,4 @@ each successful fetch touches a zero-byte marker file at
 younger than `--fetch-ttl` (default 60s), the fetch is skipped. clear it
 with `rm -rf ~/.cache/talos` or override with `--force-fetch`.
 
-## layout
-
-a quick tour of the source for anyone hacking on a fork:
-
-- `src/main.rs` — clap CLI, rayon thread-pool setup, hands off to the UI.
-- `src/ui.rs` — ratatui dashboard, key handling, background scan thread.
-- `src/scan.rs` — parallel directory walk, git plumbing, fetch cache.
-- `src/repo.rs` — `Repo` and `State` types and their colours.
 
