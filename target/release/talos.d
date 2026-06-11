@@ -1,1 +1,0 @@
-/Users/nunezcha/PANTHEON/TALOS/target/release/talos: /Users/nunezcha/PANTHEON/TALOS/src/main.rs /Users/nunezcha/PANTHEON/TALOS/src/repo.rs /Users/nunezcha/PANTHEON/TALOS/src/scan.rs /Users/nunezcha/PANTHEON/TALOS/src/ui.rs
