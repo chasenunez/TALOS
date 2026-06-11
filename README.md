@@ -8,7 +8,15 @@ originally a bash script, now in Rust.
 
 ## install
 
-needs a rust toolchain. from this directory:
+needs:
+
+- a rust toolchain on edition 2024 (rustc 1.85+). easiest path is
+  [rustup](https://rustup.rs).
+- `git` on `$PATH` — talos shells out to git for every operation.
+- macOS or Linux. the fetch shim points `GIT_ASKPASS` at `/usr/bin/true` and
+  the cache lives under `$HOME/.cache/talos`.
+
+from this directory:
 
 ```sh
 cargo build --release
@@ -16,6 +24,24 @@ cargo build --release
 
 the binary lands at `target/release/talos`. drop it on your PATH (`cp
 target/release/talos ~/.local/bin/`) or call it directly.
+
+## first run (after a fresh fork)
+
+```sh
+git clone https://github.com/<you>/talos.git
+cd talos
+cargo run --release -- --target ~/path/to/your/repos
+```
+
+the default target is `~/PANTHEON` — that's where i keep mine. yours
+probably doesn't exist, so pass `--target` and point at any directory whose
+immediate children are git clones. talos only walks one level deep and
+hidden subdirectories are skipped, so nesting like `~/code/work/foo` won't
+get picked up unless you point at `~/code/work` directly.
+
+while iterating on the code, `cargo run -- ...` (debug build) is fine for
+everything except the scan itself, and `cargo test` runs the unit tests
+that live next to the scanner.
 
 ## use
 
@@ -25,8 +51,15 @@ talos --target ~/code       # scan somewhere else
 talos --no-fetch            # skip the network round-trip (fast, stale data)
 talos --force-fetch         # ignore the fetch cache and refetch everything
 talos --fetch-ttl 300       # only refetch a repo if last fetch was >5min ago
+talos --refresh 60          # seconds between background auto-rescans (default 30)
 talos -j 4                  # fewer parallel workers (default 16)
 ```
+
+keys, once the dashboard is up:
+
+- `r` — rescan now (respects the fetch cache).
+- `f` — force-fetch every repo on the next rescan.
+- `q` / Esc / Ctrl-C — quit.
 
 example output:
 
@@ -92,4 +125,13 @@ each successful fetch touches a zero-byte marker file at
 `~/.cache/talos/<repo>.fetch`. on the next run, if the marker's mtime is
 younger than `--fetch-ttl` (default 60s), the fetch is skipped. clear it
 with `rm -rf ~/.cache/talos` or override with `--force-fetch`.
+
+## layout
+
+a quick tour of the source for anyone hacking on a fork:
+
+- `src/main.rs` — clap CLI, rayon thread-pool setup, hands off to the UI.
+- `src/ui.rs` — ratatui dashboard, key handling, background scan thread.
+- `src/scan.rs` — parallel directory walk, git plumbing, fetch cache.
+- `src/repo.rs` — `Repo` and `State` types and their colours.
 
