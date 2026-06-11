@@ -28,7 +28,7 @@ cargo build --release
 the binary lands at `target/release/talos`. drop it on your PATH (`cp
 target/release/talos ~/.local/bin/`) or call it directly.
 
-## first run (after a fresh fork)
+## first run
 
 ```sh
 git clone https://github.com/<you>/talos.git
