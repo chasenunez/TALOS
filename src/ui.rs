@@ -245,9 +245,14 @@ fn draw_table(f: &mut Frame, area: Rect, app: &App) {
         };
         let dirty = if r.dirty { "*" } else { "" };
         let row_style = Style::new().fg(r.state.color());
+        let name_cell = if r.dirty {
+            Cell::from(r.name.clone()).style(Style::new().fg(Color::Magenta))
+        } else {
+            Cell::from(r.name.clone())
+        };
         Row::new(vec![
             Cell::from((i + 1).to_string()),
-            Cell::from(r.name.clone()),
+            name_cell,
             Cell::from(r.branch.clone()),
             Cell::from(r.state.label()),
             Cell::from(dirty).style(Style::new().fg(Color::Magenta)),
