@@ -234,7 +234,7 @@ fn draw_header(f: &mut Frame, area: Rect, app: &App) {
 }
 
 fn draw_table(f: &mut Frame, area: Rect, app: &App) {
-    let header = Row::new(["#", "repo", "branch", "state", "*", "+/-", "last", "Σ"])
+    let header = Row::new(["#", "repo", "branch", "state", "+/-", "last", "Σ"])
         .style(Style::new().add_modifier(Modifier::BOLD | Modifier::UNDERLINED));
 
     let rows = app.repos.iter().enumerate().map(|(i, r)| {
@@ -243,19 +243,16 @@ fn draw_table(f: &mut Frame, area: Rect, app: &App) {
         } else {
             format!("{}/{}", r.ahead, r.behind)
         };
-        let dirty = if r.dirty { "*" } else { "" };
-        let row_style = Style::new().fg(r.state.color());
-        let name_cell = if r.dirty {
-            Cell::from(r.name.clone()).style(Style::new().fg(Color::Magenta))
+        let row_style = if r.dirty {
+            Style::new().fg(Color::Magenta)
         } else {
-            Cell::from(r.name.clone())
+            Style::new().fg(r.state.color())
         };
         Row::new(vec![
             Cell::from((i + 1).to_string()),
-            name_cell,
+            Cell::from(r.name.clone()),
             Cell::from(r.branch.clone()),
             Cell::from(r.state.label()),
-            Cell::from(dirty).style(Style::new().fg(Color::Magenta)),
             Cell::from(plusminus),
             Cell::from(r.last_commit.clone()),
             Cell::from(r.commits.to_string()),
@@ -268,7 +265,6 @@ fn draw_table(f: &mut Frame, area: Rect, app: &App) {
         Constraint::Min(20),
         Constraint::Length(18),
         Constraint::Length(11),
-        Constraint::Length(1),
         Constraint::Length(8),
         Constraint::Length(8),
         Constraint::Length(6),
