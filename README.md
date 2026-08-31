@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/1265871816.svg)](https://doi.org/10.5281/zenodo.22206974)
+
 # TALOS
 
 A terminal dashboard for a directory full of git repos. it tells you which ones need pulling, which ones need pushing, which ones have uncommitted work, and which ones aren't actually git repos at all. Originally a bash script, now in Rust. 
